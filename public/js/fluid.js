@@ -433,8 +433,8 @@
     }
     
     var aspect = canvas.width / canvas.height;
-    pointer.dx = (x - pointer.x) * (aspect < 1 ? aspect : 1.0);
-    pointer.dy = (y - pointer.y) / (aspect > 1 ? aspect : 1.0);
+    pointer.dx += (x - pointer.x) * (aspect < 1 ? aspect : 1.0);
+    pointer.dy += (y - pointer.y) / (aspect > 1 ? aspect : 1.0);
     pointer.x = x; 
     pointer.y = y;
     
@@ -443,20 +443,10 @@
     lastInput = performance.now();
   }
 
-  // Bind to window to catch movement anywhere on the page
-  window.addEventListener("mousemove", function (e) { 
-    updatePointer(e.clientX, e.clientY); 
-  }, { passive: true });
-
+// Bind pointermove and touchmove inputs
   window.addEventListener("pointermove", function (e) {
-    if (e.pointerType === "mouse" || e.pointerType === "touch") {
-      updatePointer(e.clientX, e.clientY);
-    }
+    updatePointer(e.clientX, e.clientY);
   }, { passive: true });
-
-  document.addEventListener("mouseleave", function () { 
-    pointer.active = false; 
-  });
 
   window.addEventListener("touchstart", function (e) {
     var t = e.touches[0];
@@ -474,6 +464,10 @@
     pointer.active = false; 
   }, { passive: true });
 
+  document.addEventListener("mouseleave", function () { 
+    pointer.active = false; 
+  });
+
   /* ---------- Main loop ---------- */
   var lastTime = performance.now();
   var running = true;
@@ -487,9 +481,17 @@
     if (resizeCanvas()) initFramebuffers();
 
     if (now - pointer.colorTime > 900) { pointer.color = nextColor(); pointer.colorTime = now; }
-    if (pointer.moved) {
+   if (pointer.moved) {
       pointer.moved = false;
-      splat(pointer.x, pointer.y, pointer.dx * CONFIG.SPLAT_FORCE, pointer.dy * CONFIG.SPLAT_FORCE, pointer.color);
+      splat(
+        pointer.x, 
+        pointer.y, 
+        pointer.dx * CONFIG.SPLAT_FORCE, 
+        pointer.dy * CONFIG.SPLAT_FORCE, 
+        [pointer.color[0] * 2, pointer.color[1] * 2, pointer.color[2] * 2]
+      );
+      pointer.dx = 0;
+      pointer.dy = 0;
     }
     if (now - lastInput > CONFIG.IDLE_SPLAT_MS) {
       lastInput = now;
