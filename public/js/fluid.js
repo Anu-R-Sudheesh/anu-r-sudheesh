@@ -31,7 +31,9 @@
     SPLAT_RADIUS: 0.22,         // brush size
     SPLAT_FORCE: 5200,
     COLOR_INTENSITY: 0.56,      // keep low so text stays readable
-    IDLE_SPLAT_MS: 3200         // gentle ambient splats when nobody is interacting
+    POINTER_COLOR_BOOST: 2.5,
+    IDLE_SPLAT_MS: 3200,         // gentle ambient splats when nobody is interacting
+    
   };
 
   // Accent palette (matches --violet, --teal, --pink in styles.css), RGB 0..1
@@ -444,10 +446,13 @@
   }
 
 // Bind pointermove and touchmove inputs
-  window.addEventListener("pointermove", function (e) {
-    updatePointer(e.clientX, e.clientY);
-  }, { passive: true });
 
+   window.addEventListener("pointermove", function (e) {
+    if (e.pointerType !== "touch") {
+      updatePointer(e.clientX, e.clientY);
+    }
+  }, { passive: true });
+   
   window.addEventListener("touchstart", function (e) {
     var t = e.touches[0];
     pointer.active = false;
@@ -488,7 +493,11 @@
         pointer.y, 
         pointer.dx * CONFIG.SPLAT_FORCE, 
         pointer.dy * CONFIG.SPLAT_FORCE, 
-        [pointer.color[0] * 2, pointer.color[1] * 2, pointer.color[2] * 2]
+        [
+          pointer.color[0] * CONFIG.POINTER_COLOR_BOOST, 
+          pointer.color[1] * CONFIG.POINTER_COLOR_BOOST, 
+          pointer.color[2] * CONFIG.POINTER_COLOR_BOOST
+        ]
       );
       pointer.dx = 0;
       pointer.dy = 0;
