@@ -27,11 +27,11 @@
     VELOCITY_DISSIPATION: 0.35, // how fast motion settles
     PRESSURE: 0.8,
     PRESSURE_ITERATIONS: isSmall ? 12 : 20,
-    CURL: 24,                   // swirliness
-    SPLAT_RADIUS: 0.35,         // brush size
-    SPLAT_FORCE: 8000,
-    COLOR_INTENSITY: 0.7,      // keep low so text stays readable
-    POINTER_COLOR_BOOST: 2.5,
+    CURL: 14,                   // swirliness
+    SPLAT_RADIUS: 0.12,         // brush size
+    SPLAT_FORCE: 3000,
+    COLOR_INTENSITY: 0.4,      // keep low so text stays readable
+    POINTER_COLOR_BOOST: 1.5,
     IDLE_SPLAT_MS: 3200,         // gentle ambient splats when nobody is interacting
     
   };
