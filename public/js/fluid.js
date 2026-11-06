@@ -461,10 +461,6 @@
     }, { passive: true });
   }
 
-  document.addEventListener("mouseleave", function () { 
-    pointer.active = false; 
-  });
-
   window.addEventListener("touchstart", function (e) {
     var t = e.touches[0];
     pointer.active = false;
@@ -481,6 +477,10 @@
     pointer.active = false; 
   }, { passive: true });
 
+  document.addEventListener("mouseleave", function () { 
+    pointer.active = false; 
+  });
+
   /* ---------- Main loop ---------- */
   var lastTime = performance.now();
   var running = true;
@@ -494,7 +494,7 @@
     if (resizeCanvas()) initFramebuffers();
 
     if (now - pointer.colorTime > 900) { pointer.color = nextColor(); pointer.colorTime = now; }
-    if (pointer.moved) {
+   if (pointer.moved) {
       pointer.moved = false;
       var pc = pointer.color, boost = CONFIG.POINTER_COLOR_BOOST;
       splat(pointer.x, pointer.y, pointer.dx * CONFIG.SPLAT_FORCE, pointer.dy * CONFIG.SPLAT_FORCE, [pc[0] * boost, pc[1] * boost, pc[2] * boost]);
