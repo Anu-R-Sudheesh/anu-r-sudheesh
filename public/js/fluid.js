@@ -512,12 +512,7 @@
     rafId = requestAnimationFrame(frame);
   }
 
-  resizeCanvas();
-  initFramebuffers();
-  randomSplats(isSmall ? 3 : 5);
-  rafId = requestAnimationFrame(frame);
-
-  // Pause when the tab is hidden; resume cleanly
+ // Pause when the tab is hidden; resume cleanly
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) { running = false; cancelAnimationFrame(rafId); }
     else if (!root.classList.contains("no-fluid")) { running = true; lastTime = performance.now(); rafId = requestAnimationFrame(frame); }
@@ -532,4 +527,17 @@
 
   // Recover from a lost GPU context by falling back to the static gradient
   canvas.addEventListener("webglcontextlost", function (e) { e.preventDefault(); running = false; useStatic(); });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFluid);
+  } else {
+    initFluid();
+  }
+
+  function initFluid() {
+    resizeCanvas();
+    initFramebuffers();
+    randomSplats(isSmall ? 3 : 5);
+    rafId = requestAnimationFrame(frame);
+  }
 })();
