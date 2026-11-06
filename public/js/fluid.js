@@ -374,14 +374,16 @@
     blit(dye.write); dye.swap();
   }
 
-  function render() {
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.disable(gl.BLEND);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    P.display.bind();
-    gl.uniform1i(P.display.u.uTexture, dye.read.attach(0));
-    blit(null);
-  }
+
+   function render() {
+  gl.disable(gl.BLEND);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);   // draw to the screen, not the dye buffer
+  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  P.display.bind();
+  gl.uniform1i(P.display.u.uTexture, dye.read.attach(0));
+  blit(null);
+}
 
   /* ---------- Splats (injecting color + force) ---------- */
   function correctRadius(r) {
