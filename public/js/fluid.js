@@ -30,7 +30,7 @@
     CURL: 24,                   // swirliness
     SPLAT_RADIUS: 0.22,         // brush size
     SPLAT_FORCE: 5200,
-    COLOR_INTENSITY: 0.16,      // keep low so text stays readable
+    COLOR_INTENSITY: 0.56,      // keep low so text stays readable
     IDLE_SPLAT_MS: 3200         // gentle ambient splats when nobody is interacting
   };
 
