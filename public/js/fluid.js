@@ -30,7 +30,8 @@
     CURL: 24,                   // swirliness
     SPLAT_RADIUS: 0.22,         // brush size
     SPLAT_FORCE: 5200,
-    COLOR_INTENSITY: 0.56,      // keep low so text stays readable
+    COLOR_INTENSITY: 0.16,      // keep low so text stays readable
+    POINTER_COLOR_BOOST: 2.5,   // brightens the ink left by the cursor or finger
     IDLE_SPLAT_MS: 3200         // gentle ambient splats when nobody is interacting
   };
 
@@ -56,9 +57,11 @@
     var halfFloat, supportLinear;
     if (isWebGL2) {
       g.getExtension("EXT_color_buffer_float");
+      g.getExtension("EXT_color_buffer_half_float");
       supportLinear = g.getExtension("OES_texture_float_linear");
     } else {
       halfFloat = g.getExtension("OES_texture_half_float");
+      g.getExtension("EXT_color_buffer_half_float");
       supportLinear = g.getExtension("OES_texture_half_float_linear");
     }
     var type = isWebGL2 ? g.HALF_FLOAT : halfFloat && halfFloat.HALF_FLOAT_OES;
@@ -433,6 +436,8 @@
     }
     
     var aspect = canvas.width / canvas.height;
+    // Accumulate (+=) so several events in one frame add up instead of
+    // a duplicate event at the same position resetting the motion to zero
     pointer.dx += (x - pointer.x) * (aspect < 1 ? aspect : 1.0);
     pointer.dy += (y - pointer.y) / (aspect > 1 ? aspect : 1.0);
     pointer.x = x; 
@@ -443,10 +448,18 @@
     lastInput = performance.now();
   }
 
-// Bind pointermove and touchmove inputs
-  window.addEventListener("pointermove", function (e) {
-    updatePointer(e.clientX, e.clientY);
-  }, { passive: true });
+  // Bind to window to catch movement anywhere on the page.
+  // One source per input type: pointer events for mouse/pen, touch events
+  // for fingers (touchmove keeps firing while iOS scrolls the page).
+  if (window.PointerEvent) {
+    window.addEventListener("pointermove", function (e) {
+      if (e.pointerType !== "touch") updatePointer(e.clientX, e.clientY);
+    }, { passive: true });
+  } else {
+    window.addEventListener("mousemove", function (e) {
+      updatePointer(e.clientX, e.clientY);
+    }, { passive: true });
+  }
 
   window.addEventListener("touchstart", function (e) {
     var t = e.touches[0];
@@ -483,13 +496,8 @@
     if (now - pointer.colorTime > 900) { pointer.color = nextColor(); pointer.colorTime = now; }
    if (pointer.moved) {
       pointer.moved = false;
-      splat(
-        pointer.x, 
-        pointer.y, 
-        pointer.dx * CONFIG.SPLAT_FORCE, 
-        pointer.dy * CONFIG.SPLAT_FORCE, 
-        [pointer.color[0] * 2, pointer.color[1] * 2, pointer.color[2] * 2]
-      );
+      var pc = pointer.color, boost = CONFIG.POINTER_COLOR_BOOST;
+      splat(pointer.x, pointer.y, pointer.dx * CONFIG.SPLAT_FORCE, pointer.dy * CONFIG.SPLAT_FORCE, [pc[0] * boost, pc[1] * boost, pc[2] * boost]);
       pointer.dx = 0;
       pointer.dy = 0;
     }
