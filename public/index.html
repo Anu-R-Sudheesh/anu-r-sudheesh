@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- ===== SEO + social sharing ===== -->
+  <title>Anu | UI/UX and Product Designer for Games, Products and XR</title>
+  <meta name="description" content="Anu is a UI/UX and Product Designer with roots in engineering, enterprise IT and XR development, designing clear, data-dense interfaces for games, products and spatial experiences." />
+  <meta name="theme-color" content="#07070d" />
+  <link rel="canonical" href="https://roaring-choux-7f406b.netlify.app/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Anu | UI/UX and Product Designer" />
+  <meta property="og:description" content="Designing clear, human-centered interfaces for games, products and XR. Engineering roots, Google UX certified." />
+  <meta property="og:url" content="https://roaring-choux-7f406b.netlify.app/" />
+  <meta property="og:site_name" content="Anu Portfolio" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Anu | UI/UX and Product Designer" />
+  <meta name="twitter:description" content="Designing clear, human-centered interfaces for games, products and XR." />
+
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+
+  <!-- ===== Fonts: Space Grotesk (headings) + Manrope (body) ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ===== Background: WebGL fluid canvas + readability overlay ===== -->
+  <div class="bg" aria-hidden="true">
+    <canvas id="fluid"></canvas>
+    <div class="bg__static"></div>
+    <div class="bg__overlay"></div>
+  </div>
+
+  <!-- ===== Sticky navigation ===== -->
+  <header class="nav" id="top">
+    <div class="nav__inner container">
+      <a class="nav__logo" href="#hero" aria-label="Anu, back to top">
+        <span class="nav__dot" aria-hidden="true"></span>Anu
+      </a>
+      <nav aria-label="Primary">
+        <ul class="nav__links">
+          <li><a href="#work">Work</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ===== 1. HERO ===== -->
+    <section class="hero container" id="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">Portfolio · 2026</p>
+      <h1 class="hero__title" id="hero-title">Hi, I'm <span class="gradient-text">Anu</span></h1>
+      <p class="hero__role">UI/UX and Product Designer</p>
+      <p class="hero__tagline">Designing clear, playable interfaces for games, products and XR, from first sketch to developer handoff.</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#work">View My Work</a>
+        <a class="btn btn--ghost" href="#about">About Me</a>
+      </div>
+      <p class="hero__hint" aria-hidden="true">Move your cursor or finger to stir the ink</p>
+    </section>
+
+    <!-- ===== 2. WORK (cards rendered from js/content.js) ===== -->
+    <section class="section container" id="work" aria-labelledby="work-title">
+      <div class="section__head reveal">
+        <p class="eyebrow">01 · Work</p>
+        <h2 id="work-title">Selected Work</h2>
+      </div>
+
+      <ul class="work-grid" id="work-grid" role="list"></ul>
+      <noscript><p class="panel">Projects are listed on <a href="https://www.behance.net/anursudheesh">Behance</a>.</p></noscript>
+
+      <div class="work__more reveal">
+        <a class="btn btn--primary" id="behance-all" href="https://www.behance.net/anursudheesh" target="_blank" rel="noopener">
+          See all projects on Behance <span aria-hidden="true">↗</span>
+          <span class="sr-only">(opens in a new tab)</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== 3. ABOUT ===== -->
+    <section class="section container" id="about" aria-labelledby="about-title">
+      <div class="section__head reveal">
+        <p class="eyebrow">02 · About</p>
+        <h2 id="about-title">From engineering to experience</h2>
+        <p class="about__roles">UI/UX Designer <span aria-hidden="true">|</span> Product Designer <span aria-hidden="true">|</span> Spatial &amp; XR Interaction</p>
+      </div>
+
+      <div class="about">
+        <div class="panel about__story reveal">
+          <p class="lead">I didn't start in design. I started in engineering. Then infrastructure. Then XR. Somewhere along the way, I realized the thread connecting all of it was the same thing: making complex systems feel simple to the person using them.</p>
+          <p>Now I do that deliberately, with hands-on experience building both mainstream digital interfaces and spatial XR frameworks. Designing at the intersection of psychology, art, and engineering logic, I specialize in data-dense, intuitive interfaces: the kind that reward attention to detail and hold up under real use.</p>
+          <p>My process lives between structured Figma systems (Auto Layout, components, variables) and real-time engines like Unity, which means I think about design both as craft and as code. Backed by a Google UX Certification, I architect user-centered layouts, interactive prototypes, and immersive XR experiences that are as functionally rigorous as they are visually sharp.</p>
+          <blockquote class="about__quote">
+            <p>My engineering roots mean I think about constraints, not just aesthetics.</p>
+            <p>My design instincts mean I never lose sight of the person on the other side of the screen.</p>
+          </blockquote>
+        </div>
+
+        <div class="about__side">
+          <!-- Journey timeline: edit or add steps here -->
+          <div class="panel reveal">
+            <h3>The journey</h3>
+            <ol class="journey">
+              <li><span class="journey__step">Engineering</span><span class="journey__text">Electronics &amp; Communication Engineering (ECE). Learned to think in systems and constraints.</span></li>
+              <li><span class="journey__step">Enterprise IT</span><span class="journey__text">Storage and backup administration. Lived inside heavy, data-dense enterprise tools every day.</span></li>
+              <li><span class="journey__step">XR Development</span><span class="journey__text">Built spatial interfaces in Unity with C# and the XR Interaction Toolkit.</span></li>
+              <li><span class="journey__step">UI/UX &amp; Product</span><span class="journey__text">Google UX Certified. Now designing interfaces that keep complex systems clear and fast.</span></li>
+            </ol>
+          </div>
+
+          <div class="panel reveal">
+            <h3><span aria-hidden="true">🛠</span> Toolkit</h3>
+            <ul class="chips" role="list">
+              <li>Figma</li><li>HTML/CSS</li><li>Game UI/UX</li><li>Interaction Design</li>
+              <li>Photoshop</li><li>Autodesk Maya</li><li>Substance Painter</li><li>Unity</li>
+              <li>C#</li><li>XR Interaction Toolkit</li><li>IT Infrastructure &amp; Technical Problem-Solving</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 4. CONTACT ===== -->
+    <section class="section container" id="contact" aria-labelledby="contact-title">
+      <div class="panel contact reveal">
+        <p class="eyebrow">03 · Contact</p>
+        <h2 id="contact-title">Let's work together</h2>
+        <p class="contact__intro">Open to UI/UX, Product Design and XR Experience Design roles. Say hello.</p>
+
+        <ul class="contact__list" role="list">
+          <li>
+            <a class="contact__link" id="contact-email" href="mailto:anusudheesh32@gmail.com">
+              <span class="contact__label">Email</span>
+              <span class="contact__value" data-field="email">anusudheesh32@gmail.com</span>
+            </a>
+          </li>
+          <li>
+            <a class="contact__link" id="contact-phone" href="tel:8301950895">
+              <span class="contact__label">Phone</span>
+              <span class="contact__value" data-field="phone">8301950895</span>
+            </a>
+          </li>
+          <li>
+            <a class="contact__link" id="contact-behance" href="https://www.behance.net/anursudheesh" target="_blank" rel="noopener">
+              <span class="contact__label">Behance</span>
+              <span class="contact__value">behance.net/anursudheesh <span aria-hidden="true">↗</span></span>
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+          </li>
+          <li>
+            <a class="contact__link" id="contact-linkedin" href="https://www.linkedin.com/in/anu-r-sudheesh-792143170/" target="_blank" rel="noopener">
+              <span class="contact__label">LinkedIn</span>
+              <span class="contact__value">Anu R Sudheesh <span aria-hidden="true">↗</span></span>
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== 5. FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year">2026</span> Anu. All rights reserved.</p>
+      <a href="#hero">Back to top <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+
+  <!-- Content first, then page behaviour, then the fluid background -->
+  <script src="/js/content.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/fluid.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <radialGradient id="a" cx="25%" cy="30%" r="70%"><stop offset="0" stop-color="#ff5c9e" stop-opacity=".85"/><stop offset="1" stop-color="#ff5c9e" stop-opacity="0"/></radialGradient>
+    <radialGradient id="b" cx="80%" cy="80%" r="65%"><stop offset="0" stop-color="#7c6cff" stop-opacity=".75"/><stop offset="1" stop-color="#7c6cff" stop-opacity="0"/></radialGradient>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".06"/></pattern>
+  </defs>
+  <rect width="800" height="600" fill="#0d0d18"/>
+  <rect width="800" height="600" fill="url(#a)"/>
+  <rect width="800" height="600" fill="url(#b)"/>
+  <rect width="800" height="600" fill="url(#g)"/>
+  <rect x="210" y="170" width="380" height="260" rx="18" fill="#0b0b14" fill-opacity=".55" stroke="#fff" stroke-opacity=".18"/>
+  <rect x="240" y="200" width="140" height="14" rx="7" fill="#fff" fill-opacity=".7"/>
+  <rect x="240" y="228" width="220" height="10" rx="5" fill="#fff" fill-opacity=".25"/>
+  <rect x="240" y="270" width="150" height="130" rx="10" fill="#ff5c9e" fill-opacity=".45"/>
+  <rect x="406" y="270" width="154" height="60" rx="10" fill="#7c6cff" fill-opacity=".45"/>
+  <rect x="406" y="340" width="154" height="60" rx="10" fill="#fff" fill-opacity=".12"/>
+  <text x="40" y="560" font-family="Arial, sans-serif" font-size="22" letter-spacing="4" fill="#fff" fill-opacity=".55">PROJECT 02</text>
+</svg>
