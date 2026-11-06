@@ -423,35 +423,56 @@
 
   function updatePointer(clientX, clientY) {
     var x = clientX / window.innerWidth;
-    var y = 1 - clientY / window.innerHeight;
+    var y = 1.0 - (clientY / window.innerHeight);
+    
     if (!pointer.active) {
       pointer.active = true;
-      pointer.x = x; pointer.y = y;
+      pointer.x = x; 
+      pointer.y = y;
       return;
     }
+    
     var aspect = canvas.width / canvas.height;
-    pointer.dx = (x - pointer.x) * (aspect < 1 ? aspect : 1);
-    pointer.dy = (y - pointer.y) / (aspect > 1 ? aspect : 1);
-    pointer.x = x; pointer.y = y;
-    pointer.moved = Math.abs(pointer.dx) > 0 || Math.abs(pointer.dy) > 0;
+    pointer.dx = (x - pointer.x) * (aspect < 1 ? aspect : 1.0);
+    pointer.dy = (y - pointer.y) / (aspect > 1 ? aspect : 1.0);
+    pointer.x = x; 
+    pointer.y = y;
+    
+    // Always trigger movement while active so light cursor shifts register
+    pointer.moved = true;
     lastInput = performance.now();
   }
 
-  window.addEventListener("mousemove", function (e) { updatePointer(e.clientX, e.clientY); }, { passive: true });
-  document.addEventListener("mouseleave", function () { pointer.active = false; });
+  // Bind to window to catch movement anywhere on the page
+  window.addEventListener("mousemove", function (e) { 
+    updatePointer(e.clientX, e.clientY); 
+  }, { passive: true });
 
-  // Passive touch listeners: the ink follows the finger without blocking page scroll
+  window.addEventListener("pointermove", function (e) {
+    if (e.pointerType === "mouse" || e.pointerType === "touch") {
+      updatePointer(e.clientX, e.clientY);
+    }
+  }, { passive: true });
+
+  document.addEventListener("mouseleave", function () { 
+    pointer.active = false; 
+  });
+
   window.addEventListener("touchstart", function (e) {
     var t = e.touches[0];
     pointer.active = false;
     pointer.color = nextColor();
     updatePointer(t.clientX, t.clientY);
   }, { passive: true });
+
   window.addEventListener("touchmove", function (e) {
     var t = e.touches[0];
     updatePointer(t.clientX, t.clientY);
   }, { passive: true });
-  window.addEventListener("touchend", function () { pointer.active = false; }, { passive: true });
+
+  window.addEventListener("touchend", function () { 
+    pointer.active = false; 
+  }, { passive: true });
 
   /* ---------- Main loop ---------- */
   var lastTime = performance.now();
