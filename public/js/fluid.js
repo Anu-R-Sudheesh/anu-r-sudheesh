@@ -417,7 +417,7 @@
   function randomSplats(n) {
     for (var i = 0; i < n; i++) {
       var c = nextColor();
-      splat(Math.random(), Math.random(), 900 * (Math.random() - 0.5), 900 * (Math.random() - 0.5), [c[0] * 3, c[1] * 3, c[2] * 3]);
+      splat(Math.random(), Math.random(), 900 * (Math.random() - 0.5), 900 * (Math.random() - 0.5), [c[0] * 1.5, c[1] * 1.5, c[2] * 1.5]);
     }
   }
 
