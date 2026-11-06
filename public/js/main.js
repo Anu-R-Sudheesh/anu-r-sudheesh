@@ -28,7 +28,7 @@
         '<li class="card reveal">' +
           '<a class="card__link" href="' + escapeHtml(p.url) + '" target="_blank" rel="noopener">' +
             '<div class="card__media">' +
-              '<img src="' + escapeHtml(p.cover) + '" alt="' + escapeHtml(p.alt || p.title) + '" width="800" height="400" loading="lazy" decoding="async" />' +
+              '<img src="' + escapeHtml(p.cover) + '" alt="' + escapeHtml(p.alt || p.title) + '" width="600" height="800" loading="lazy" decoding="async" />' +
             "</div>" +
             '<div class="card__body">' +
               (tags ? '<ul class="card__tags" role="list">' + tags + "</ul>" : "") +
