@@ -23,14 +23,14 @@
     SIM_RESOLUTION: isSmall ? 64 : 128,     // velocity grid (lower = faster)
     DYE_RESOLUTION: isSmall ? 384 : 1024,   // color detail
     PIXEL_RATIO: Math.min(window.devicePixelRatio || 1, isSmall ? 1.25 : 1.75),
-    DENSITY_DISSIPATION: 1.1,   // how fast color fades
+    DENSITY_DISSIPATION: 0.8,   // how fast color fades
     VELOCITY_DISSIPATION: 0.35, // how fast motion settles
     PRESSURE: 0.8,
     PRESSURE_ITERATIONS: isSmall ? 12 : 20,
     CURL: 24,                   // swirliness
-    SPLAT_RADIUS: 0.22,         // brush size
-    SPLAT_FORCE: 5200,
-    COLOR_INTENSITY: 0.56,      // keep low so text stays readable
+    SPLAT_RADIUS: 0.35,         // brush size
+    SPLAT_FORCE: 8000,
+    COLOR_INTENSITY: 0.7,      // keep low so text stays readable
     POINTER_COLOR_BOOST: 2.5,
     IDLE_SPLAT_MS: 3200,         // gentle ambient splats when nobody is interacting
     
