@@ -14,8 +14,12 @@
   var canvas = document.getElementById("fluid");
   var motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  function useStatic() { root.classList.add("no-fluid"); }
-  if (!canvas || motionQuery.matches) { useStatic(); return; }
+  function useStatic(reason) {
+    root.classList.add("no-fluid");
+    if (reason && window.console) console.warn("[fluid] Using static background: " + reason);
+  }
+  if (!canvas) { useStatic("#fluid canvas not found"); return; }
+  if (motionQuery.matches) { useStatic(); return; }
 
   /* ---------- Config ---------- */
   var isSmall = Math.min(window.innerWidth, window.innerHeight) < 720;
@@ -28,8 +32,10 @@
     PRESSURE: 0.8,
     PRESSURE_ITERATIONS: isSmall ? 12 : 20,
     CURL: 24,                   // swirliness
-    SPLAT_RADIUS: 0.22,         // brush size
-    SPLAT_FORCE: 5200,
+    SPLAT_RADIUS: isSmall ? 0.6 : 0.45, // brush size (bigger = broader swirl)
+    SPLAT_FORCE: 9000,          // how hard the pointer pushes the fluid
+    MAX_FORCE: 2600,            // cap per frame so fast flicks stay stable
+    POINTER_COLOR_BOOST: 1.8,   // extra dye for pointer splats so the trail is visible
     COLOR_INTENSITY: 0.16,      // keep low so text stays readable
     IDLE_SPLAT_MS: 3200         // gentle ambient splats when nobody is interacting
   };
@@ -42,8 +48,10 @@
   ];
 
   /* ---------- WebGL context + capability detection ---------- */
-  var ctx = getContext(canvas);
-  if (!ctx) { useStatic(); return; }
+  var ctx = null;
+  try { ctx = getContext(canvas); }
+  catch (err) { if (window.console) console.error("[fluid] WebGL context creation failed:", err); }
+  if (!ctx) { useStatic("WebGL (with half float render targets) is not available"); return; }
   var gl = ctx.gl, ext = ctx.ext;
 
   function getContext(c) {
@@ -212,7 +220,8 @@
       P[k] = createProgram(shaders[k], k === "advection" && !ext.linear ? "#define MANUAL_FILTERING\n" : "");
     });
   } catch (err) {
-    useStatic();
+    if (window.console) console.error("[fluid] Shader compile/link failed:", err);
+    useStatic("shader error");
     return;
   }
 
@@ -418,61 +427,79 @@
   }
 
   /* ---------- Pointer + touch input ---------- */
-  var pointer = { x: 0, y: 0, dx: 0, dy: 0, moved: false, active: false, color: nextColor(), colorTime: 0 };
+  // Listeners live on window (the canvas has pointer-events: none), so input
+  // is read anywhere on the page, even over panels, links and buttons.
+  // Movement is accumulated between frames and consumed once per frame, so
+  // several events in one frame add up instead of overwriting each other.
+  var pointer = { x: 0.5, y: 0.5, dx: 0, dy: 0, moved: false, active: false, color: nextColor(), colorTime: 0 };
   var lastInput = performance.now();
+  var canvasRect = { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
 
-  function updatePointer(clientX, clientY) {
-    var x = clientX / window.innerWidth;
-    var y = 1.0 - (clientY / window.innerHeight);
-    
-    if (!pointer.active) {
-      pointer.active = true;
-      pointer.x = x; 
-      pointer.y = y;
-      return;
-    }
-    
+  function measureCanvas() {
+    var r = canvas.getBoundingClientRect();
+    canvasRect = { left: r.left, top: r.top, width: r.width || window.innerWidth, height: r.height || window.innerHeight };
+  }
+
+  // Convert viewport coordinates to the canvas's normalised 0..1 space (y up, like the GL texture)
+  function toCanvasSpace(clientX, clientY) {
+    return {
+      x: (clientX - canvasRect.left) / canvasRect.width,
+      y: 1.0 - (clientY - canvasRect.top) / canvasRect.height
+    };
+  }
+
+  function startPointer(clientX, clientY) {
+    var p = toCanvasSpace(clientX, clientY);
+    pointer.active = true;
+    pointer.x = p.x; pointer.y = p.y;
+    pointer.dx = 0; pointer.dy = 0;
+    lastInput = performance.now();
+  }
+
+  function movePointer(clientX, clientY) {
+    if (!pointer.active) { startPointer(clientX, clientY); return; }
+    var p = toCanvasSpace(clientX, clientY);
     var aspect = canvas.width / canvas.height;
-    pointer.dx = (x - pointer.x) * (aspect < 1 ? aspect : 1.0);
-    pointer.dy = (y - pointer.y) / (aspect > 1 ? aspect : 1.0);
-    pointer.x = x; 
-    pointer.y = y;
-    
-    // Always trigger movement while active so light cursor shifts register
+    var dx = (p.x - pointer.x) * (aspect < 1 ? aspect : 1.0);
+    var dy = (p.y - pointer.y) / (aspect > 1 ? aspect : 1.0);
+    pointer.x = p.x; pointer.y = p.y;
+    if (dx === 0 && dy === 0) return;
+    pointer.dx += dx;
+    pointer.dy += dy;
     pointer.moved = true;
     lastInput = performance.now();
   }
 
-  // Bind to window to catch movement anywhere on the page
-  window.addEventListener("mousemove", function (e) { 
-    updatePointer(e.clientX, e.clientY); 
-  }, { passive: true });
+  function endPointer() { pointer.active = false; }
 
-  window.addEventListener("pointermove", function (e) {
-    if (e.pointerType === "mouse" || e.pointerType === "touch") {
-      updatePointer(e.clientX, e.clientY);
-    }
-  }, { passive: true });
+  // Desktop: mouse. (Only one event family per input type, otherwise the
+  // duplicate event at the same position resets the velocity to zero.)
+  window.addEventListener("mousemove", function (e) { movePointer(e.clientX, e.clientY); }, { passive: true });
+  window.addEventListener("mouseout", function (e) { if (!e.relatedTarget) endPointer(); }, { passive: true });
+  window.addEventListener("blur", endPointer);
 
-  document.addEventListener("mouseleave", function () { 
-    pointer.active = false; 
-  });
-
+  // Mobile: touch and drag. Passive so scrolling is never blocked.
   window.addEventListener("touchstart", function (e) {
     var t = e.touches[0];
-    pointer.active = false;
+    if (!t) return;
     pointer.color = nextColor();
-    updatePointer(t.clientX, t.clientY);
+    startPointer(t.clientX, t.clientY);
+    // Small drop of ink where the finger lands so a tap is visible too
+    splatQueue.push({ x: pointer.x, y: pointer.y });
   }, { passive: true });
 
   window.addEventListener("touchmove", function (e) {
     var t = e.touches[0];
-    updatePointer(t.clientX, t.clientY);
+    if (t) movePointer(t.clientX, t.clientY);
   }, { passive: true });
 
-  window.addEventListener("touchend", function () { 
-    pointer.active = false; 
-  }, { passive: true });
+  window.addEventListener("touchend", endPointer, { passive: true });
+  window.addEventListener("touchcancel", endPointer, { passive: true });
+
+  var splatQueue = [];
+  var needsResize = true;
+  window.addEventListener("resize", function () { needsResize = true; }, { passive: true });
+  window.addEventListener("orientationchange", function () { needsResize = true; }, { passive: true });
 
   /* ---------- Main loop ---------- */
   var lastTime = performance.now();
@@ -484,26 +511,53 @@
     var dt = Math.min((now - lastTime) / 1000, 0.016666);
     lastTime = now;
 
-    if (resizeCanvas()) initFramebuffers();
+    // clientWidth is checked every frame as well, which also catches mobile URL bar changes
+    if (needsResize) { needsResize = false; measureCanvas(); }
+    if (resizeCanvas()) { measureCanvas(); initFramebuffers(); }
 
     if (now - pointer.colorTime > 900) { pointer.color = nextColor(); pointer.colorTime = now; }
+    var boost = CONFIG.POINTER_COLOR_BOOST;
+    while (splatQueue.length) {
+      var q = splatQueue.shift(), c = pointer.color;
+      splat(q.x, q.y, 0, 0, [c[0] * boost, c[1] * boost, c[2] * boost]);
+    }
     if (pointer.moved) {
       pointer.moved = false;
-      splat(pointer.x, pointer.y, pointer.dx * CONFIG.SPLAT_FORCE, pointer.dy * CONFIG.SPLAT_FORCE, pointer.color);
+      var fx = pointer.dx * CONFIG.SPLAT_FORCE, fy = pointer.dy * CONFIG.SPLAT_FORCE;
+      pointer.dx = 0; pointer.dy = 0;
+      // Clamp so a fast flick cannot blow up the solver
+      var mag = Math.sqrt(fx * fx + fy * fy);
+      if (mag > CONFIG.MAX_FORCE) { fx *= CONFIG.MAX_FORCE / mag; fy *= CONFIG.MAX_FORCE / mag; }
+      var pc = pointer.color;
+      splat(pointer.x, pointer.y, fx, fy, [pc[0] * boost, pc[1] * boost, pc[2] * boost]);
     }
     if (now - lastInput > CONFIG.IDLE_SPLAT_MS) {
       lastInput = now;
       randomSplats(1);
     }
 
-    step(dt);
-    render();
+    try {
+      step(dt);
+      render();
+    } catch (err) {
+      if (window.console) console.error("[fluid] Simulation error:", err);
+      running = false;
+      useStatic("simulation error");
+      return;
+    }
     rafId = requestAnimationFrame(frame);
   }
 
-  resizeCanvas();
-  initFramebuffers();
-  randomSplats(isSmall ? 3 : 5);
+  try {
+    resizeCanvas();
+    measureCanvas();
+    initFramebuffers();
+    randomSplats(isSmall ? 3 : 5);
+  } catch (err) {
+    if (window.console) console.error("[fluid] Initialisation failed:", err);
+    useStatic("initialisation error");
+    return;
+  }
   rafId = requestAnimationFrame(frame);
 
   // Pause when the tab is hidden; resume cleanly
@@ -520,5 +574,5 @@
   else if (motionQuery.addListener) motionQuery.addListener(onMotionChange);
 
   // Recover from a lost GPU context by falling back to the static gradient
-  canvas.addEventListener("webglcontextlost", function (e) { e.preventDefault(); running = false; useStatic(); });
+  canvas.addEventListener("webglcontextlost", function (e) { e.preventDefault(); running = false; cancelAnimationFrame(rafId); useStatic("WebGL context lost"); });
 })();
